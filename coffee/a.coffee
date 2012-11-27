@@ -9,7 +9,7 @@ class Tribble
     @isAlive = false
 
   @count: 0
-  @makeTrouble: -> console.log ('Trouble!' for i in [0..@count]).join(' ')
+  @makTrouble: -> console.log ('Trouble!' for i in [0..@count]).join(' ')
 
 t1 = new Tribble
 t2 = new Tribble
@@ -17,5 +17,3 @@ t2 = new Tribble
 console.log Tribble
 console.log Tribble.prototype
 console.log t1
-console.log Tribble.makeTrouble
-console.log Tribble.makeTrouble()

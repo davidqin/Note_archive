@@ -1,0 +1,26 @@
+<script type="text/javascript">
+var add = function (a, b) {
+    return a + b;
+};
+
+var array = [3, 4];
+var sum  = add.apply(null, array);
+
+document.writeln(sum);
+
+var statusObject = {
+    status: 'A-OK'
+};
+
+var Quo = function (string){
+    this.status = string;
+    console.log(this);
+};
+
+Quo.prototype.get_status = function () {
+    return this.status;
+};
+
+var status = Quo.prototype.get_status.apply(statusObject);
+document.writeln(status);
+</script>

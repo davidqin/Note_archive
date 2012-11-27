@@ -1,0 +1,21 @@
+<script type="text/javascript">
+function add (x, y){
+    return x + y
+}
+
+var myObject = {
+    value: 3,
+    double: function(){
+        var that = this;
+        var helper = function(){
+            that.value = add(that.value, that.value);
+            console.log(this);
+        };
+        helper();
+    }
+};
+document.writeln('"this" is the window, see the console');
+
+myObject.double();
+document.writeln(myObject.value);
+</script>
