@@ -1,0 +1,14 @@
+<script type="text/javascript">
+var Quo = function (string){
+    this.status = string;
+    console.log(this);
+}
+
+Quo.prototype.get_status = function () {
+    return this.status;
+};
+
+var myQuo  = new Quo("confused");
+document.writeln(myQuo.get_status());
+document.writeln('"this" is the instance, see the console');
+</script>

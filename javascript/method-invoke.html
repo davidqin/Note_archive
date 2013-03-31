@@ -1,0 +1,16 @@
+<script type="text/javascript">
+var myObject = {
+    value: 0,
+    increment: function(inc){
+        this.value += typeof inc === 'number' ? inc : 1;
+    }
+};
+
+document.writeln('"this" is the object!');
+
+myObject.increment();
+document.writeln(myObject.value);
+
+myObject.increment(2);
+document.writeln(myObject.value);
+</script>
