@@ -1,0 +1,15 @@
+class Appliance
+  constructor: (warranty) ->
+    warrantyDb.save(this) if warranty
+
+class Toaster extends Appliance
+  constructor: (warranty) ->
+    super()
+
+class Toaster2 extends Appliance
+  constructor: (warranty) ->
+    super(warranty)
+
+class Toaster2 extends Appliance
+  constructor: (warranty) ->
+    super
