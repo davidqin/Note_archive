@@ -11,7 +11,7 @@
 
 ##### 选方案
 
-在commonjs和AMD上徘徊了好久，决定用AMD规范。了解了下require.js，感觉有些复杂，选择了一个替代品，[Do.js](https://github.com/kejun/Do)。
+在commonjs和AMD上徘徊了好久，开始试验AMD。了解了下require.js，感觉有些复杂，选择了一个替代品，[Do.js](https://github.com/kejun/Do)。
 
 ##### 问题出现
 
@@ -51,3 +51,14 @@ commonjs的代码组织方式和ruby很像，用什么require什么，同步加�
 并且也没有找到如何让其分开加载js文件。
 
 未完待续
+
+单个controller用来写游戏逻辑
+
+游戏逻辑开始变多
+一个controller开始不能应付
+room.haml越来越复杂开始考虑使用前端模版
+
+eco
+
+gobang_controller 逻辑过多，使用event来解除耦合
+
