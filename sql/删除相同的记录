@@ -1,0 +1,4 @@
+create table officer_logins_tmp as select max(id) as ids from officer_logins group by officer_id , login_date;
+create index idx_ids on officer_logins_tmp (ids);
+delete from officer_logins where id not in (select ids from officer_logins_tmp);
+drop table officer_logins_tmp;
