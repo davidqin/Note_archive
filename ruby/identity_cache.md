@@ -4,6 +4,8 @@ identity_cache
 
 一些基础
 ----
+### ruby
+allocate创建类实例分配空间的过程
 ### class variable(@@x) 与 class instance variable(@x)
 
 ```
@@ -30,9 +32,63 @@ end
 ActiveSupport有实现：activesupport-3.2.14/lib/active_support/core_ext/class/attribute.rb
 
 参考资料：http://ihower.tw/blog/archives/4878
+### ActiveRecord 相关
+```
+User.quoted_primary_key 
+ => "`id`"
+User.quoted_table_name
+ => "`users`"
 
-cache_has_many
+# coder的概念
+class Post < ActiveRecord::Base
+end
+coder = {}
+Post.new.encode_with(coder)
+coder # => { 'id' => nil, ... }
+
+class Post < ActiveRecord::Base
+end
+
+post = Post.allocate
+post.init_with('attributes' => { 'title' => 'hello world' })
+post.title # => 'hello world'
+```
+identity_cache部分
 --------
+### fetch_by_id
+根据id生成cache_key，在缓存中查找cache_key，如果没有的话获取对象，拿到对象coder，存入缓存，也就是说，缓存对象实际上缓存的是对象的coder。
+通过coder拿到object，返回object
+### fetch
+fetch_by_id的找不到抛异常版本
+### ActiveRecord::Base.fetch_multi
+之所以这样命名本段，是为了区别IndentityCache.fetch_multi
+find_batch
+### cache_index
+
+生成一些实例方法
+例如
+
+```
+class Product
+  include IdentityCache
+  cache_index :name, :vendor
+end
+
+Product.fetch_by_name_and_vendor
+
+```
+#### 可选的参数 options[:unique]
+
+最直接的解释就是在sql中是否加入'LIMIT 1'，换言之，返回id还是ids
+
+true的时候生成两个方法
+
+`fetch_by_name_and_vendor`
+`fetch_by_name_and_vendor!` 返回结果空得时候抛出异常
+
+空得时候只会有不抛异常的方法。
+
+### cache_has_many
 
 ```
 
@@ -66,9 +122,10 @@ options[:population_method_name]  ||= "populate_#{association}_cache"
 
 options[:prepopulate_method_name] ||= "prepopulate_fetched_#{association}"
 #=> prepopulate_fetched_orders
-
+```
 相当于向order model中注入以下方法
 
+```
 class Order
   attr_reader :cached_order_ids
 
@@ -96,4 +153,5 @@ class Order
   end
 end
 ```
+Order.fetch_multi 注意区别 IndentityCache.fetch_multi
 
