@@ -1,12 +1,11 @@
 
-identity_cache
+identity_cache源码阅读笔记
 =======
-
 一些基础
 ----
 ### ruby
 allocate创建类实例分配空间的过程
-### class variable(@@x) 与 class instance variable(@x)
+### Class variable(@@x) 与 Class instance variable(@x)
 
 ```
 # class variable
@@ -53,16 +52,94 @@ post = Post.allocate
 post.init_with('attributes' => { 'title' => 'hello world' })
 post.title # => 'hello world'
 ```
+```
+class User < ActiveRecord::Base
+  serialize :preferences
+end
+
+user = User.create(preferences: { "background" => "black", "display" => large })
+User.find(user.id).preferences # => { "background" => "black", "display" => large }
+
+User.serialized_attributes
+# => {"preferences"=>#<ActiveRecord::Coders::YAMLColumn:0x007fa079afc5a0 @object_class=Object>}
+```
+
 identity_cache部分
 --------
+## 概述
+模块分割很清晰：
+
+- 顶级空间下的工具函数
+- cache_key_generator
+- query_api
+- cache_proxy
+- dsl
+
+
+## query_api部分
+
+### coder_from_record
+##### 功能
+将一个record整理成一个hash，hash包含很多属性（下面详细解释），缓存这个对象的时候，实际上缓存的是这个hash
+##### 结构
+coder的结构是
+
+```
+{
+  class: Order,
+  attributes: {
+  	id: 1,
+  	...
+  },
+  associations:{
+  	...
+  	# 所有的embedded_associations
+  	# 即所有的 cache_has_many :xxx, embed: true
+  },
+  normalized_has_many: [
+  	...
+  	# 所有的
+  	# 即所有的 cache_has_many :xxx, embed: true
+  ],
+}
+```
+##### 实现
+自己看源码解决
+
+### record_from_coder
+##### 功能
+通过一个hash构建一个record，及其embedded_associations records
+
+### resolve_cache_miss
+##### 功能
+看似最简单，却干了最多事的一个函数，identity_cache获取单条数据函数（fetch、fetch_by_id）当发现缓存中没有数据时与数据库交互的入口
+
+##### 具体实现
+
 ### fetch_by_id
-根据id生成cache_key，在缓存中查找cache_key，如果没有的话获取对象，拿到对象coder，存入缓存，也就是说，缓存对象实际上缓存的是对象的coder。
-通过coder拿到object，返回object
+
+```
+coder = IdentityCache.fetch(rails_cache_key(id)){ 
+  coder_from_record(object = resolve_cache_miss(id)) 
+}
+object ||= record_from_coder(coder)
+```
 ### fetch
 fetch_by_id的找不到抛异常版本
-### ActiveRecord::Base.fetch_multi
-之所以这样命名本段，是为了区别IndentityCache.fetch_multi
-find_batch
+
+### find_batch
+
+```
+#it behaves like ActiveRecord::Base.find_all_by_id
+
+where('id IN (?)', ids).includes(cache_fetch_includes(options[:includes])).to_a
+```
+
+identity_cache获取多条记录时，当发现缓存中没有数据时与数据库交互的入口，返回对象中可能存在空对象
+
+
+## dsl部分
+
 ### cache_index
 
 生成一些实例方法
@@ -155,3 +232,5 @@ end
 ```
 Order.fetch_multi 注意区别 IndentityCache.fetch_multi
 
+
+david整理，这句话的意思是冤有头债有主。
